@@ -7,7 +7,9 @@ __pycache__/
 *.pyc
 
 # Django
+# Secret settings — never commit. .env.example IS committed (placeholders only).
 .env
+!.env.example
 /media/
 staticfiles/
 
