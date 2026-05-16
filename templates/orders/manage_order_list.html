@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Orders - Watch House{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <h2 class="mb-0"><i class="fas fa-clipboard-list me-2"></i> Manage Orders</h2>
+
+        <!-- Status filter -->
+        <form method="get" class="d-flex align-items-center gap-2">
+            <label class="text-muted small mb-0">Filter</label>
+            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()"
+                    style="width:auto;">
+                <option value="">All statuses</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+            {% if current_status %}
+                <a href="{% url 'orders:manage_order_list' %}" class="btn btn-sm btn-outline-secondary">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    {% if orders %}
+        {% for order in orders %}
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span>
+                    <i class="fas fa-receipt me-2"></i> Order #{{ order.id }}
+                    <span class="text-muted small ms-2">{{ order.created_at|date:"M d, Y - g:i A" }}</span>
+                </span>
+                {% if order.status == 'pending' %}
+                    <span class="badge bg-warning">Pending</span>
+                {% elif order.status == 'processing' %}
+                    <span class="badge bg-info">Processing</span>
+                {% elif order.status == 'shipped' %}
+                    <span class="badge bg-primary">Shipped</span>
+                {% elif order.status == 'delivered' %}
+                    <span class="badge bg-success">Delivered</span>
+                {% elif order.status == 'cancelled' %}
+                    <span class="badge bg-danger">Cancelled</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <!-- Customer & shipping -->
+                    <div class="col-md-5">
+                        <h6 class="footer-heading">Customer</h6>
+                        <p class="mb-1">{{ order.full_name }}
+                            <span class="text-muted small">(@{{ order.user.username }})</span></p>
+                        <p class="text-muted small mb-1"><i class="fas fa-envelope me-1"></i> {{ order.email }}</p>
+                        <p class="text-muted small mb-3"><i class="fas fa-phone me-1"></i> {{ order.phone }}</p>
+
+                        <h6 class="footer-heading">Ship To</h6>
+                        <p class="text-muted small mb-1">
+                            {{ order.shipping_address }}<br>
+                            {{ order.city }}{% if order.postal_code %}, {{ order.postal_code }}{% endif %}
+                        </p>
+                        <p class="text-muted small mb-0">
+                            <i class="fas fa-money-bill me-1"></i> {{ order.get_payment_method_display }}
+                        </p>
+                    </div>
+
+                    <!-- Items -->
+                    <div class="col-md-4">
+                        <h6 class="footer-heading">Items ({{ order.total_items }})</h6>
+                        <ul class="list-group">
+                            {% for item in order.items.all %}
+                            <li class="list-group-item d-flex justify-content-between py-2">
+                                <span class="small">{{ item.product.name }} &times; {{ item.quantity }}</span>
+                                <span class="small fw-bold">NPR {{ item.subtotal }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <p class="mt-2 mb-0 text-end">
+                            <span class="text-muted small">Total:</span>
+                            <span class="price-tag">NPR {{ order.total_amount|add:100 }}</span>
+                        </p>
+                    </div>
+
+                    <!-- Status update -->
+                    <div class="col-md-3">
+                        <h6 class="footer-heading">Update Status</h6>
+                        <form method="post"
+                              action="{% url 'orders:manage_order_update_status' order.id %}">
+                            {% csrf_token %}
+                            <select name="status" class="form-select mb-2">
+                                {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-check me-1"></i> Save Status
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-clipboard-list fa-4x"></i>
+            <h3>No orders found</h3>
+            <p>
+                {% if current_status %}
+                    No orders with this status. <a href="{% url 'orders:manage_order_list' %}">Show all orders</a>.
+                {% else %}
+                    No customer orders have been placed yet.
+                {% endif %}
+            </p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

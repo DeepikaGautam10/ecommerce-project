@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - Watch House{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4"><i class="fas fa-box-open me-2"></i> My Orders</h2>
+
+    {% if orders %}
+        {% for order in orders %}
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span><i class="fas fa-receipt me-2"></i> Order #{{ order.id }}</span>
+                <span class="text-muted small">{{ order.created_at|date:"M d, Y" }}</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-7">
+                        <ul class="list-group">
+                            {% for item in order.items.all %}
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>{{ item.product.name }} &times; {{ item.quantity }}</span>
+                                <span class="fw-bold">NPR {{ item.subtotal }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Status</span>
+                            <span class="badge bg-info">{{ order.get_status_display }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Items</span>
+                            <span>{{ order.total_items }}</span>
+                        </div>
+                        <hr style="border-color:var(--border);">
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="h6 mb-0">Total</span>
+                            <span class="h6 mb-0 price-tag">NPR {{ order.total_amount|add:100 }}</span>
+                        </div>
+                        <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-primary w-100">
+                            <i class="fas fa-eye me-1"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-box fa-4x"></i>
+            <h3>No orders yet</h3>
+            <p>You haven't placed any orders. Start shopping to see them here.</p>
+            <a href="{% url 'products:shop' %}" class="btn btn-primary">
+                <i class="fas fa-bag-shopping me-1"></i> Start Shopping
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Product - Watch House{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header"><i class="fas fa-triangle-exclamation me-2 text-danger"></i> Delete Product</div>
+                <div class="card-body text-center">
+                    <i class="fas fa-triangle-exclamation fa-3x text-danger mb-3"></i>
+                    <h5 class="mb-2">Delete "{{ product.name }}"?</h5>
+                    <p class="text-muted">This action cannot be undone.</p>
+
+                    <form method="post" class="d-flex justify-content-center gap-2">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i> Yes, Delete
+                        </button>
+                        <a href="{% url 'products:product_list_admin' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

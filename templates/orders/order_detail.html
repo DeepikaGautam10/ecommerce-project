@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Order #{{ order.id }} - Watch House{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-receipt me-2"></i> Order #{{ order.id }}</span>
+                    <span class="badge bg-info">{{ order.get_status_display }}</span>
+                </div>
+                <div class="card-body">
+                    <h5 class="mb-3">Order Information</h5>
+                    <table class="table table-borderless mb-4">
+                        <tr>
+                            <th style="width:180px;" class="text-muted">Order Date</th>
+                            <td>{{ order.created_at|date:"F d, Y - g:i A" }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Payment Method</th>
+                            <td>{{ order.get_payment_method_display }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Total Items</th>
+                            <td>{{ order.total_items }}</td>
+                        </tr>
+                    </table>
+
+                    <h5 class="mb-3">Shipping Address</h5>
+                    <address class="text-muted mb-4">
+                        <strong style="color:var(--text);">{{ order.full_name }}</strong><br>
+                        {{ order.shipping_address }}<br>
+                        {{ order.city }}{% if order.postal_code %}, {{ order.postal_code }}{% endif %}<br>
+                        Phone: {{ order.phone }}<br>
+                        Email: {{ order.email }}
+                    </address>
+
+                    {% if order.notes %}
+                    <h5 class="mb-2">Order Notes</h5>
+                    <p class="text-muted mb-4">{{ order.notes }}</p>
+                    {% endif %}
+
+                    <h5 class="mb-3">Order Items</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Qty</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if item.product.image %}
+                                                <img src="{{ item.product.image.url }}" width="44" height="44"
+                                                     class="rounded me-2" style="object-fit:cover;" alt="">
+                                            {% endif %}
+                                            <span>{{ item.product.name }}</span>
+                                        </div>
+                                    </td>
+                                    <td>NPR {{ item.price }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td class="text-end">NPR {{ item.subtotal }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">Payment Summary</div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Subtotal</span>
+                        <span>NPR {{ order.total_amount }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Shipping</span>
+                        <span>NPR 100</span>
+                    </div>
+                    <hr style="border-color:var(--border);">
+                    <div class="d-flex justify-content-between">
+                        <span class="h5 mb-0">Total</span>
+                        <span class="h5 mb-0 price-tag">NPR {{ order.total_amount|add:100 }}</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'orders:order_list' %}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-arrow-left me-1"></i> Back to My Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

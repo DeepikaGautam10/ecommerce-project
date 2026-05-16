@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% load static product_extras %}
+
+{% block title %}Watch House - Premium Watches Store{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="hero">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Left: feature image with overlay -->
+            <div class="col-lg-6">
+                <div class="hero-feature">
+                    {% if hero_product and hero_product.image %}
+                        <img src="{{ hero_product.image.url }}" alt="{{ hero_product.name }}" class="hero-feature-img">
+                    {% else %}
+                        <img src="{% static 'image/logo.jpg' %}" alt="Watch House" class="hero-feature-img">
+                    {% endif %}
+                    <div class="hero-feature-overlay">
+                        <span class="eyebrow">The 2026 Collection</span>
+                        <h1 class="hero-feature-title">
+                            Crafted for those who value <span class="brand-accent">time</span>
+                        </h1>
+                        <p class="hero-feature-text">
+                            Premium timepieces from the world's most iconic brands —
+                            luxury, smart, sports and classic watches in one place.
+                        </p>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{% url 'products:shop' %}" class="btn btn-primary btn-lg px-4">
+                                <i class="fas fa-bag-shopping me-2"></i> Shop Now
+                            </a>
+                            {% if hero_product %}
+                                <a href="{% url 'products:product_detail' hero_product.slug %}"
+                                   class="btn btn-outline-secondary btn-lg px-4">
+                                    View Featured
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: sliding product carousel -->
+            <div class="col-lg-6">
+                <div class="hero-slider-wrap" data-slider>
+                    <div class="hero-slider-head">
+                        <h5 class="mb-0"><i class="fas fa-fire text-primary"></i> Trending Now</h5>
+                        <div class="hero-slider-nav">
+                            <button type="button" class="slider-btn" data-slider-prev aria-label="Previous">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button type="button" class="slider-btn" data-slider-next aria-label="Next">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    {% if featured_products %}
+                    <div class="hero-slider-track" data-slider-track>
+                        {% for product in featured_products %}
+                        <div class="hero-slide">
+                            <a href="{% url 'products:product_detail' product.slug %}" class="hero-slide-card">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" class="hero-slide-img" alt="{{ product.name }}">
+                                {% else %}
+                                    <div class="hero-slide-ph"><i class="fas fa-clock"></i></div>
+                                {% endif %}
+                                <div class="hero-slide-body">
+                                    <span class="hero-slide-cat">{{ product.category.name }}</span>
+                                    <h6 class="hero-slide-name">{{ product.name }}</h6>
+                                    <span class="price-tag" style="font-size:1rem;">NPR {{ product.price }}</span>
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <a href="{% url 'products:shop' %}" class="hero-slider-link">
+                        Explore Collection <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                    {% else %}
+                    <p class="text-muted">New arrivals coming soon.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Trust / feature strip -->
+<section class="feature-strip">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-6 col-lg-3">
+                <div class="feature-item">
+                    <span class="feature-icon"><i class="fas fa-shield-halved"></i></span>
+                    <div>
+                        <h6>100% Authentic</h6>
+                        <p>Genuine brands only</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="feature-item">
+                    <span class="feature-icon"><i class="fas fa-truck-fast"></i></span>
+                    <div>
+                        <h6>Fast Delivery</h6>
+                        <p>Quick & reliable shipping</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="feature-item">
+                    <span class="feature-icon"><i class="fas fa-lock"></i></span>
+                    <div>
+                        <h6>Secure Payment</h6>
+                        <p>Safe, encrypted checkout</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="feature-item">
+                    <span class="feature-icon"><i class="fas fa-arrow-rotate-left"></i></span>
+                    <div>
+                        <h6>Easy Returns</h6>
+                        <p>7-day return policy</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Latest arrivals -->
+<section class="section">
+    <div class="container">
+        <div class="text-center">
+            <span class="eyebrow">Just In</span>
+            <h2 class="section-title">Latest Arrivals</h2>
+            <p class="section-subtitle">The newest additions to our collection</p>
+        </div>
+
+        <div class="row g-4">
+            {% for product in latest_products %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="card h-100 product-card">
+                    {% if product.featured %}
+                        <span class="card-tag"><i class="fas fa-star me-1"></i> Featured</span>
+                    {% endif %}
+                    <a href="{% url 'products:product_detail' product.slug %}" class="media-wrap">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" class="media-thumb" alt="{{ product.name }}">
+                        {% else %}
+                            <div class="media-placeholder"><i class="fas fa-clock"></i></div>
+                        {% endif %}
+                    </a>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <div class="mb-2">{% star_rating product %}</div>
+                        <p class="card-text text-muted small flex-grow-1">{{ product.description|truncatewords:10 }}</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="price-tag">NPR {{ product.price }}</span>
+                            {% if product.is_in_stock %}
+                                <span class="badge bg-success">In Stock</span>
+                            {% else %}
+                                <span class="badge bg-danger">Sold Out</span>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'products:product_detail' product.slug %}" class="btn btn-outline-primary w-100">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="fas fa-box-open fa-3x"></i>
+                    <h3>No products yet</h3>
+                    <p>Check back soon for our latest watches.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if latest_products %}
+        <div class="text-center mt-4">
+            <a href="{% url 'products:shop' %}" class="btn btn-primary px-4">View All Products</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Categories -->
+{% if categories %}
+<section class="section" style="background-color: var(--surface);">
+    <div class="container">
+        <div class="text-center">
+            <span class="eyebrow">Browse</span>
+            <h2 class="section-title">Shop by Category</h2>
+            <p class="section-subtitle">Find the perfect style for every occasion</p>
+        </div>
+
+        <div class="row g-4">
+            {% for category in categories %}
+            <div class="col-6 col-md-4">
+                <a href="{% url 'products:shop' %}?category={{ category.slug }}" class="text-decoration-none">
+                    <div class="card h-100 category-card">
+                        <div class="media-wrap">
+                            {% if category.image %}
+                                <img src="{{ category.image.url }}" class="media-thumb" alt="{{ category.name }}">
+                            {% else %}
+                                <div class="media-placeholder"><i class="fas fa-layer-group"></i></div>
+                            {% endif %}
+                        </div>
+                        <div class="card-body text-center">
+                            <h5 class="card-title mb-1">{{ category.name }}</h5>
+                            <p class="text-muted small mb-0">{{ category.description|truncatewords:8 }}</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
